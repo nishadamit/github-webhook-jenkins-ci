@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenkins Webhooks Guide</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f7fb;
+            color: #222;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #fff;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            border-radius: 12px;
+        }
+        h1, h2, h3 {
+            color: #1f3a93;
+        }
+        code {
+            background: #eef3fa;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-family: Menlo, Monaco, Consolas, monospace;
+        }
+        pre {
+            background: #eef3fa;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        ul {
+            margin: 0.5rem 0 1.2rem 1.5rem;
+        }
+        .note {
+            padding: 1rem;
+            background: #e8f0ff;
+            border-left: 4px solid #1f3a93;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jenkins Webhooks</h1>
+        <p>Webhooks are a common way to trigger Jenkins jobs automatically when code changes or external events occur. They let another service send an HTTP request to Jenkins so a build or pipeline can start without manual intervention.</p>
+
+        <h2>How Jenkins Webhooks Work</h2>
+        <p>The basic flow is:</p>
+        <ul>
+            <li>A source system or service (like GitHub, GitLab, Bitbucket, or a custom app) detects an event.</li>
+            <li>That service sends an HTTP POST request to Jenkins with event data.</li>
+            <li>Jenkins receives the webhook request on a configured endpoint.</li>
+            <li>Jenkins validates the request, then triggers a job or pipeline.</li>
+        </ul>
+
+        <h2>Common Webhook Use Cases</h2>
+        <ul>
+            <li>Triggering a Jenkins build when code is pushed to a repository.</li>
+            <li>Starting a pipeline after a pull request is opened or updated.</li>
+            <li>Running tests automatically when a branch is updated.</li>
+            <li>Deploying code after a successful merge to a main branch.</li>
+        </ul>
+
+        <h2>Jenkins Webhook Endpoints</h2>
+        <p>Jenkins exposes endpoints that can accept webhook payloads. The most common endpoint is part of the Jenkins Git plugin or the GitHub/GitLab integration:</p>
+        <pre><code>https://jenkins.example.com/github-webhook/</code></pre>
+        <p>For generic polling or remote trigger jobs, Jenkins also supports:</p>
+        <pre><code>https://jenkins.example.com/job/my-job/build?token=MY_SECRET_TOKEN</code></pre>
+
+        <div class="note">
+            <strong>Tip:</strong> Use a secure token or secret to protect your webhook endpoint from unauthorized triggers.
+        </div>
+
+        <h2>Setting Up GitHub Webhooks for Jenkins</h2>
+        <p>Steps to configure GitHub to trigger Jenkins:</p>
+        <ol>
+            <li>Create or open a Jenkins job/pipeline that has GitHub integration enabled.</li>
+            <li>Configure the job to accept <strong>GitHub webhook</strong> events, usually via the Git plugin or GitHub plugin.</li>
+            <li>In your GitHub repository, go to <strong>Settings &gt; Webhooks</strong>.</li>
+            <li>Add a new webhook with the Jenkins URL, typically <code>https://jenkins.example.com/github-webhook/</code>.</li>
+            <li>Select the events you want to trigger builds, such as <strong>Push events</strong> or <strong>Pull request events</strong>.</li>
+            <li>Save the webhook. GitHub will send a test payload automatically.</li>
+        </ol>
+
+        <h2>Using a Remote Trigger Token</h2>
+        <p>If you do not use a dedicated GitHub/GitLab plugin, you can use Jenkins remote build tokens:</p>
+        <pre><code>https://jenkins.example.com/job/my-job/build?token=MY_SECRET_TOKEN</code></pre>
+        <p>Then configure the webhook on your SCM service to POST to that URL when a change occurs.</p>
+
+        <h2>Webhook Security Best Practices</h2>
+        <ul>
+            <li>Use HTTPS to encrypt webhook traffic.</li>
+            <li>Require a secret or token to authenticate webhook requests.</li>
+            <li>Limit webhooks to only the events needed for your workflow.</li>
+            <li>Validate payload signatures when supported by the source service.</li>
+        </ul>
+
+        <h2>Jenkins Pipeline Example</h2>
+        <p>In a Jenkins Pipeline, webhook-triggered jobs are often defined with SCM polling disabled and webhook triggers enabled:</p>
+        <pre><code>pipeline {
+    agent any
+    triggers {
+        githubPush()
+    }
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+            }
+        }
+    }
+}</code></pre>
+
+        <h2>Why Use Webhooks?</h2>
+        <p>Webhooks make Jenkins builds reactive instead of polling-based. This reduces load, improves responsiveness, and makes CI/CD workflows more efficient.</p>
+
+        <p>With Jenkins webhooks, you can create fast, event-driven pipelines that respond immediately to repository changes or external events.</p>
+    </div>
+</body>
+</html>
